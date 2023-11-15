@@ -1,67 +1,41 @@
-import { click } from '@testing-library/user-event/dist/click';
 import React from 'react';
 import ReactDOM from 'react-dom';
-import { createStore } from 'redux'
+import { createStore, bindActionCreators } from 'redux';
+import reducer from './reducer';
+import * as actions from './actions';
 
+const store = createStore(reducer);
 
-const initialState = {value: 0}
-
-const reducer = (state = initialState, action) => {
-  switch (action.type) {
-    case "INC":
-      return {
-        ...state,
-        value: state.value + 1
-      };
-    case "DEC":
-      return {
-        ...state,
-        value: state.value - 1
-      };
-    case "RNDM":
-      return {
-        ...state,
-        value: state.value * action.payload
-      };
-      
-    default:
-      return state
-
-  }
-}
-
-
-const store = createStore(reducer)
+const {dispatch, subscribe, getState} = store;
 
 const update = () => {
-  document.getElementById("counter").textContent = store.getState().value
+    document.getElementById('counter').textContent = getState().value;
 }
 
-store.subscribe(update)
+subscribe(update);
 
-const inc = ()=> ({ type: "INC" });
-const dec = ()=> ({ type: "DEC" });
-const rndm = (value)=> ({ type: "RNDM", payload:value });
+// const bindActionCreator = (creator, dispatch) => (...args) => {
+//     dispatch(creator(...args));
+// }
 
-document.getElementById("inc").addEventListener("click", () => {
-    store.dispatch(inc())
-  })
-document.getElementById("dec").addEventListener("click", () => {
-    store.dispatch(dec())
-  })
+const {inc, dec, rnd} = bindActionCreators( actions, dispatch);
+// const decDispatch = bindActionCreators(dec, dispatch);
+// const rndDispatch = bindActionCreators(rnd, dispatch);
 
-document.getElementById("rndm").addEventListener("click", () => {
-  const value = Math.floor(Math.random() * 10)
-    store.dispatch(rndm(value))
-  })
+document.getElementById('inc').addEventListener('click', inc);
 
+document.getElementById('dec').addEventListener('click', dec);
 
+document.getElementById('rnd').addEventListener('click', () => {
+    const value = Math.floor(Math.random() * 10);
+    rnd(value);
+});
 
 ReactDOM.render(
-    <React.StrictMode>
-      <>
-
-      </>
-    </React.StrictMode>,
-    document.getElementById('root')
-  );
+  <React.StrictMode>
+    <>
+    
+    </>
+  </React.StrictMode>,
+  document.getElementById('root')
+);
